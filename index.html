@@ -1,0 +1,28 @@
+<!doctype html><html lang="zh-CN"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#f7f8fb"><link rel="manifest" href="manifest.json"><title>每日自律打卡</title>
+<style>
+body{margin:0;background:#f7f8fb;color:#222;font-family:system-ui,-apple-system,"Noto Sans SC",sans-serif}.app{max-width:520px;margin:auto;padding:18px 16px 30px}
+.top{display:flex;justify-content:space-between;align-items:center}h1{font-size:25px;margin:0}.date{border:0;border-radius:14px;padding:10px;background:#fff}
+.card{background:#fff;border-radius:22px;padding:18px;margin:12px 0;box-shadow:0 2px 12px #0000000a}.percent{text-align:center;font-size:28px;font-weight:700}
+.bar{height:10px;background:#eceef3;border-radius:99px;overflow:hidden}.fill{height:100%;background:#6d8df7;width:0}.task{display:flex;align-items:center;gap:12px;padding:16px 4px;border-bottom:1px solid #eee}
+.task:last-child{border:0}.check{width:28px;height:28px;border:2px solid #ccd0da;border-radius:50%;display:grid;place-items:center;flex:none}.done .check{background:#6d8df7;color:#fff;border-color:#6d8df7}.done .label{text-decoration:line-through;color:#999}
+.label{font-size:17px;flex:1}.sub{font-size:13px;color:#999;margin-top:3px}.water{display:flex;align-items:center;gap:8px}.water button{border:0;background:#eef2ff;border-radius:12px;width:42px;height:42px;font-size:22px}.count{min-width:55px;text-align:center;font-weight:700}
+.nav{display:flex;gap:8px}.nav button{flex:1;border:0;border-radius:13px;background:#fff;padding:12px}.install{display:none;background:#222;color:#fff;border:0;border-radius:14px;padding:12px 16px;width:100%;margin:12px 0;font-size:15px}
+</style></head><body><div class="app"><div class="top"><h1>每日自律打卡</h1><input id="date" class="date" type="date"></div>
+<button id="install" class="install">📱 安装到主屏幕</button><div class="card"><div id="dt" style="text-align:center;color:#777"></div><div id="pct" class="percent">0%</div><div class="bar"><div id="fill" class="fill"></div></div></div>
+<div class="card" id="tasks"></div><div class="nav"><button onclick="move(-1)">‹ 前一天</button><button onclick="today()">今天</button><button onclick="move(1)">后一天 ›</button></div></div>
+<script>
+let cur=new Date(),deferred=null; const $=id=>document.getElementById(id), ds=d=>d.toISOString().slice(0,10), key=id=>"habit_"+ds(cur)+"_"+id;
+function get(id){return localStorage.getItem(key(id))==="1"} function set(id,v){localStorage.setItem(key(id),v?"1":"0");render()}
+function water(){return +(localStorage.getItem(key("water"))||0)} function setWater(n){localStorage.setItem(key("water"),Math.max(0,Math.min(8,n)));render()}
+function bike(){let x=cur.getDay();return x==1||x==3||x==5}
+function render(){date.value=ds(cur);let names=["日","一","二","三","四","五","六"];dt.textContent=`${cur.getFullYear()}年${cur.getMonth()+1}月${cur.getDate()}日 · 星期${names[cur.getDay()]}`;
+let a=[["wake","🌅","早起","7:00 AM"],["water","💧","喝水","8杯"],["meditate","🧘","打坐","9:00 PM · 20分钟"],["sleep","🌙","早睡","10:30 PM"]];if(bike())a.splice(3,0,["bike","🚴","健身房踩脚车","20分钟"]);
+let done=a.filter(x=>x[0]=="water"?water()==8:get(x[0])).length,p=Math.round(done/a.length*100);pct.textContent=p+"%";fill.style.width=p+"%";tasks.innerHTML="";
+a.forEach(x=>{if(x[0]=="water"){tasks.innerHTML+=`<div class="task"><div style="font-size:26px">💧</div><div class="label">喝水<div class="sub">目标 8 杯</div></div><div class="water"><button onclick="event.stopPropagation();setWater(water()-1)">−</button><div class="count">${water()}/8</div><button onclick="event.stopPropagation();setWater(water()+1)">＋</button></div></div>`}else{tasks.innerHTML+=`<div class="task ${get(x[0])?'done':''}" onclick="set('${x[0]}',!get('${x[0]}'))"><div class="check">${get(x[0])?'✓':''}</div><div class="label">${x[1]} ${x[2]}<div class="sub">${x[3]}</div></div></div>`}});
+}
+date.onchange=()=>{cur=new Date(date.value+"T12:00:00");render()};function move(n){cur.setDate(cur.getDate()+n);render()}function today(){cur=new Date();render()}
+window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferred=e;install.style.display="block"});install.onclick=async()=>{if(deferred){deferred.prompt();deferred=null}};
+if("serviceWorker"in navigator)navigator.serviceWorker.register("sw.js");render();
+</script></body></html>

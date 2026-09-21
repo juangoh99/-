@@ -1,16 +1,1 @@
-{
-  "name": "每日自律打卡",
-  "short_name": "自律打卡",
-  "start_url": "./",
-  "display": "standalone",
-  "background_color": "#f7f8fb",
-  "theme_color": "#f7f8fb",
-  "icons": [
-    {
-      "src": "icon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "any maskable"
-    }
-  ]
-}
+{"name": "每日自律打卡", "short_name": "自律打卡", "start_url": "./", "display": "standalone", "background_color": "#f7f8fb", "theme_color": "#f7f8fb", "icons": [{"src": "icon.svg", "sizes": "any", "type": "image/svg+xml"}]}
